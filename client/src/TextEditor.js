@@ -3,26 +3,33 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import useDeltaToHtmlParser from "./useDeltaToHtmlParser";
 // import { io } from "socket.io-client"
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
 import { useParams } from "react-router-dom";
+
+window.katex = katex;
 
 // const SAVE_INTERVAL_MS = 2000
 const TOOLBAR_OPTIONS = [
   [{ header: [1, 2, 3, 4, 5, 6, false] }],
-  [{ font: [] }],
+  // [{ font: [] }],
+  [{ header: 1 }, { header: 2 }],
   [{ list: "ordered" }, { list: "bullet" }],
-  ["bold", "italic", "underline"],
+  ["bold", "italic", "underline", "strike"],
   [{ color: [] }, { background: [] }],
   [{ script: "sub" }, { script: "super" }],
   [{ align: [] }],
   ["image", "blockquote", "code-block"],
   ["clean"],
+  ["formula"],
 ];
 
 export default function TextEditor() {
   // const { id: documentId } = useParams()
   // const [socket, setSocket] = useState()
   const [quill, setQuill] = useState();
-  const parsedData = useDeltaToHtmlParser(quill);
+  const conversionHandler = useDeltaToHtmlParser();
   // useEffect(() => {
   //   const s = io("http://localhost:3001")
   //   setSocket(s)
@@ -81,7 +88,6 @@ export default function TextEditor() {
   //     quill.off("text-change", handler)
   //   }
   // }, [socket, quill])
-
   const wrapperRef = useCallback((wrapper) => {
     if (wrapper == null) return;
 
@@ -101,10 +107,23 @@ export default function TextEditor() {
   return (
     <>
       <button
-        style={{ zIndex: 100000000, width: "100px", height: "100px" }}
+        style={{
+          zIndex: 100000000,
+          width: "50px",
+          height: "50px",
+          position: "absolute",
+          top: "calc(100vh - 10px - 50px)",
+          right: "10px",
+          background: "black",
+          color: "white",
+          borderRadius: "10px",
+          boxShadow: "1px 0px 0px rgba(0,0,0,0.6)",
+          fontSize: "11px",
+        }}
         onClick={(e) => {
           e.preventDefault();
-          console.log(parsedData);
+          const delta = quill.getContents();
+          console.log(conversionHandler(delta));
         }}
       >
         GET DATA
